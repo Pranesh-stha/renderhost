@@ -18,7 +18,7 @@ app.get('/hi', (req, res) => {
 });
 
 app.get('/pranesh', (req, res) => {
-  res.status(200).json('Hi from pranesh home server 👋');
+  res.status(200).json('Hi from pranesh home server yeah 👋');
 });
 
 app.listen(PORT, () => {
