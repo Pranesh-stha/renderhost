@@ -1,0 +1,58 @@
+name: CI-CD (Express to Render)
+
+on:
+  pull_request:
+    branches: ["main"]
+  push:
+    branches: ["main"]
+
+jobs:
+  ci:
+    name: CI - Install, Lint, Test
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1) Pull your code into the runner
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 2) Install Node with caching
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      # 3) Install dependencies in a reproducible way
+      - name: Install dependencies
+        run: npm ci
+
+      # 4) Lint (placeholder ok for now)
+      - name: Lint
+        run: npm run lint
+
+      # 5) Tests (placeholder ok for now)
+      - name: Test
+        run: npm test
+
+  deploy:
+    name: CD - Trigger Render Deploy
+    runs-on: ubuntu-latest
+
+    # Only run deploy after CI passes
+    needs: ci
+
+    # Only deploy on direct pushes to main (NOT on pull requests)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Trigger Render deploy hook
+        env:
+          RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$RENDER_DEPLOY_HOOK_URL" ]; then
+            echo "Missing GitHub secret: RENDER_DEPLOY_HOOK_URL"
+            exit 1
+          fi
+          curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"
+          echo "Render deploy triggered."
