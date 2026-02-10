@@ -13,7 +13,8 @@ app.use(express.json());
 // }));
 
 app.get('/hi', (req, res) => {
-  res.status(200).json('Hi from Express server 👋');
+  res.status(200).json('Hi from Express server 👋 v2');
+
 });
 
 app.get('/pranesh', (req, res) => {
